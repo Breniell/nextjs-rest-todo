@@ -6,6 +6,8 @@ interface Props {
     title: string;
     description: string;
     dueDate: string;
+    done: boolean;
+    author: string;
   }) => void;
 }
 
@@ -17,7 +19,13 @@ export default function TodoForm({ onAdd }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !dueDate) return;
-    onAdd({ title, description, dueDate });
+    onAdd({
+      title,
+      description,
+      dueDate,
+      done: false,
+      author: "" // sera remplacé dans Home
+    });
     setTitle("");
     setDescription("");
     setDueDate("");
@@ -29,53 +37,49 @@ export default function TodoForm({ onAdd }: Props) {
       className="bg-white p-6 rounded-xl shadow-lg space-y-6"
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {/* Titre */}
-        <div className="col-span-1 md:col-span-3">
+        <div className="md:col-span-3">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Titre <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             placeholder="Ajouter une tâche..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
-        {/* Description */}
-        <div className="col-span-1 md:col-span-2">
+        <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Description
           </label>
           <textarea
             placeholder="Détails de la tâche..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500"
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
 
-        {/* Date limite */}
-        <div className="col-span-1">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Date limite <span className="text-red-500">*</span>
           </label>
           <input
             type="date"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Bouton Ajouter */}
       <div className="text-right">
         <button
           type="submit"
-          className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
         >
           Ajouter
         </button>

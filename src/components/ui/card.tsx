@@ -1,9 +1,28 @@
 import React from "react";
 
-export function Card({ children }: { children: React.ReactNode }) {
-  return <div className="bg-white rounded-2xl shadow p-0">{children}</div>;
+// Conteneur principal : colonne flexible, overflow caché
+export function Card({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={[
+        "flex flex-col bg-white rounded-2xl shadow overflow-hidden",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {children}
+    </div>
+  );
 }
 
+// En‑tête responsive : colonne sur mobile, ligne sur sm+, alignements et gap
 export function CardHeader({
   children,
   className = "",
@@ -12,12 +31,20 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <div className={`px-4 py-3 border-b ${className}`.trim()}>
+    <div
+      className={[
+        "flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4 py-3 border-b",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       {children}
     </div>
   );
 }
 
+// Contenu : prend tout l'espace restant
 export function CardContent({
   children,
   className = "",
@@ -25,5 +52,16 @@ export function CardContent({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <div className={`px-4 py-3 ${className}`.trim()}>{children}</div>;
+  return (
+    <div
+      className={[
+        "flex-1 px-4 py-3",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {children}
+    </div>
+  );
 }

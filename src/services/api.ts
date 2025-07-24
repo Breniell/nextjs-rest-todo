@@ -1,49 +1,51 @@
 import { Todo } from "@/types";
+import { v4 as uuidv4 } from "uuid";
 
-const BASE_URL = "https://api.restful-api.dev/objects";
+const STORAGE_KEY = "todos_app";
 
-export async function getTodos() {
-  const res = await fetch(BASE_URL);
-  const data = await res.json();
-  return (data.data || []).map((item: any) => {
-    const done = item.data?.done || false;
-    return {
-      id: item.id,
-      title: item.data?.title || "",
-      done,
-      // valeurs par défaut pour l'exemple
-      description: item.data?.description || "Pas de description fournie.",
-      dueDate: item.data?.dueDate || new Date(Date.now() + 86400000).toISOString(), // demain
-      author: item.data?.author || "Anonyme",
-      status: done ? "done" : "pending",
-    } as Todo;
-  });
+function readStorage(): Todo[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : [];
 }
 
-export async function createTodo(title: string) {
-  const res = await fetch(BASE_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: "todo",
-      data: { title, done: false },
-    }),
-  });
-  return res.json();
+function writeStorage(todos: Todo[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
 }
 
-export async function updateTodo(id: string, title: string, done: boolean) {
-  const res = await fetch(`${BASE_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: "todo",
-      data: { title, done },
-    }),
-  });
-  return res.json();
+export async function getTodos(): Promise<Todo[]> {
+  return readStorage();
 }
 
-export async function deleteTodo(id: string) {
-  return fetch(`${BASE_URL}/${id}`, { method: "DELETE" });
+export async function createTodo(data: Omit<Todo, "id" | "status">): Promise<Todo> {
+  const todos = readStorage();
+  const newTodo: Todo = { 
+    id: uuidv4(), 
+    ...data, 
+    status: data.done ? 'done' : 'pending' 
+  };
+  todos.push(newTodo);
+  writeStorage(todos);
+  return newTodo;
+}
+
+export async function updateTodo(
+  id: string,
+  updates: Partial<Omit<Todo, "id">>
+): Promise<Todo | null> {
+  const todos = readStorage();
+  const idx = todos.findIndex((t) => t.id === id);
+  if (idx === -1) return null;
+  todos[idx] = { ...todos[idx], ...updates };
+  // if done/status changed, keep status in sync
+  if (updates.done !== undefined) {
+    todos[idx].status = updates.done ? 'done' : 'pending';
+  }
+  writeStorage(todos);
+  return todos[idx];
+}
+
+export async function deleteTodo(id: string): Promise<void> {
+  const todos = readStorage().filter((t) => t.id !== id);
+  writeStorage(todos);
 }
