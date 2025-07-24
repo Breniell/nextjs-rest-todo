@@ -16,7 +16,6 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<string | null>(null);
 
-  // à l'initialisation, on lit le localStorage
   useEffect(() => {
     const stored = localStorage.getItem('todos_user');
     if (stored) setUser(stored);
@@ -39,7 +38,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Hook pour consommer le contexte
 export function useAuth() {
   return useContext(AuthContext);
 }
