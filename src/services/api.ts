@@ -1,16 +1,23 @@
-const BASE_URL = "https://restful-api.dev/objects";
+import { Todo } from "@/types";
+
+const BASE_URL = "https://api.restful-api.dev/objects";
 
 export async function getTodos() {
-    
-    const res= await fetch(BASE_URL);
-    const data= await res.json();
-    return data.data?.map((item: any) => ({
-        id: item.id,
-        title: item.data?.title || "",
-        done: item.data?.done || false,
-    }
-    )
-) || [];
+  const res = await fetch(BASE_URL);
+  const data = await res.json();
+  return (data.data || []).map((item: any) => {
+    const done = item.data?.done || false;
+    return {
+      id: item.id,
+      title: item.data?.title || "",
+      done,
+      // valeurs par défaut pour l'exemple
+      description: item.data?.description || "Pas de description fournie.",
+      dueDate: item.data?.dueDate || new Date(Date.now() + 86400000).toISOString(), // demain
+      author: item.data?.author || "Anonyme",
+      status: done ? "done" : "pending",
+    } as Todo;
+  });
 }
 
 export async function createTodo(title: string) {

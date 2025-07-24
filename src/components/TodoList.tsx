@@ -8,11 +8,12 @@ interface Props {
 }
 
 export default function TodoList({ todos, onUpdate, onDelete }: Props) {
-  if (todos.length === 0)
+  if (todos.length === 0) {
     return <p className="text-gray-500 mt-4">Aucune tâche pour le moment.</p>;
+  }
 
   return (
-    <div>
+    <div className="grid gap-4 sm:grid-cols-2">
       {todos.map((todo) => (
         <TodoItem
           key={todo.id}
